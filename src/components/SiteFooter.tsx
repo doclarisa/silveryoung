@@ -31,7 +31,7 @@ export function SiteFooter() {
         </nav>
 
         <p className="mt-6 text-base text-muted">
-          © {site.name}. All member photos are real people who chose to share them.
+          © {site.name}. All member photos are of real members who chose to share them.
         </p>
       </div>
     </footer>

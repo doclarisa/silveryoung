@@ -1,6 +1,6 @@
 import { ButtonLink } from "@/components/ButtonLink";
 import { FoundingMembers } from "@/components/FoundingMembers";
-import { site } from "@/lib/site";
+import { HomeHero } from "@/components/HomeHero";
 
 const steps = [
   {
@@ -20,26 +20,7 @@ const steps = [
 export default function Home() {
   return (
     <>
-      {/* HERO */}
-      <section className="bg-paper">
-        <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-          <p className="text-lg font-semibold uppercase tracking-wider text-plum">
-            For everyday people aged 50 and over
-          </p>
-          <h1 className="mt-4 max-w-4xl text-5xl font-semibold sm:text-7xl">{site.tagline}</h1>
-          <p className="mt-6 max-w-2xl text-xl text-muted sm:text-2xl">
-            Share your everyday style, get chosen by clothing brands for real photo shoots,
-            keep the clothes, and get paid.
-          </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <ButtonLink href="/join">Join as a Founding Member</ButtonLink>
-            <ButtonLink href="/#how-it-works" variant="secondary">
-              See how it works
-            </ButtonLink>
-          </div>
-          <p className="mt-6 text-lg text-muted">Free to join. We never share your email or address.</p>
-        </div>
-      </section>
+      <HomeHero />
 
       <FoundingMembers />
 

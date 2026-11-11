@@ -23,8 +23,8 @@ export default function AboutPage() {
       </p>
       <h2>Real people only</h2>
       <p>
-        Every face on this site belongs to a real member who chose to share it. We never use
-        stock photos or computer-generated faces.
+        Every member photo on this site belongs to a real member who chose to share it. We
+        never use stock photos or computer-generated images of members.
       </p>
       <div className="pt-4">
         <ButtonLink href="/join">Join as a Founding Member</ButtonLink>
