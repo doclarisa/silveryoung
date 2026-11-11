@@ -9,7 +9,7 @@ export const site = {
   contactEmail: "hello@silveryoungmodels.com",
   // Homepage header video. Put the files in /public/hero/ and fill these in.
   // Leave as null to show the plum background instead.
-  heroVideo: null as null | { src: string; poster: string; label: string },
+  heroVideo: null as null | { src: string; poster: string; label?: string },
   // Example once the files exist:
-  // heroVideo: { src: "/hero/hero.mp4", poster: "/hero/hero-poster.jpg", label: "AI-generated video" },
+  // heroVideo: { src: "/hero/hero.mp4", poster: "/hero/hero-poster.jpg" },
 };

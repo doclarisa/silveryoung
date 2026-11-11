@@ -7,7 +7,6 @@ import heroBeach from "@/assets/hero-beach.jpg";
 // To swap the picture: replace src/assets/hero-beach.jpg (keep it wide, people on the right).
 const HERO_ALT =
   "On a sunny beach, a woman with long silver hair in a white dress poses by the sea while a friend photographs her.";
-const HERO_LABEL = "AI-generated image";
 
 /**
  * Homepage header.
@@ -29,7 +28,6 @@ export function HomeHero() {
           placeholder="blur"
           className="object-cover object-[85%_65%]"
         />
-        <Label text={HERO_LABEL} />
       </div>
 
       {/* Larger screens: full background */}
@@ -41,18 +39,15 @@ export function HomeHero() {
             label={site.heroVideo.label}
           />
         ) : (
-          <>
-            <Image
-              src={heroBeach}
-              alt={HERO_ALT}
-              fill
-              priority
-              sizes="100vw"
-              placeholder="blur"
-              className="object-cover object-[70%_60%]"
-            />
-            <Label text={HERO_LABEL} />
-          </>
+          <Image
+            src={heroBeach}
+            alt={HERO_ALT}
+            fill
+            priority
+            sizes="100vw"
+            placeholder="blur"
+            className="object-cover object-[70%_60%]"
+          />
         )}
         {/* Plum shading keeps the white text readable over the bright sky */}
         <div
@@ -89,13 +84,5 @@ export function HomeHero() {
         </p>
       </div>
     </section>
-  );
-}
-
-function Label({ text }: { text: string }) {
-  return (
-    <p className="absolute bottom-3 left-3 z-10 rounded-full bg-black/60 px-3 py-1 text-base text-white sm:bottom-5 sm:left-auto sm:right-5">
-      {text}
-    </p>
   );
 }
