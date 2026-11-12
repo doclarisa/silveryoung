@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ButtonLink } from "./ButtonLink";
 
 /**
  * "Founding Members" grid.
@@ -13,15 +14,14 @@ export function FoundingMembers() {
     <section
       id="founding-members"
       aria-labelledby="founding-heading"
-      className="scroll-mt-6 bg-surface py-16 sm:py-20"
+      className="scroll-mt-6 bg-paper py-16 sm:py-20"
     >
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
         <h2 id="founding-heading" className="text-4xl font-semibold sm:text-5xl">
           Meet our Founding Members
         </h2>
         <p className="mt-4 max-w-2xl text-xl text-muted">
-          The very first faces of Silver Young Models. Real people, real style, no
-          retouching. Tap a photo to see their profile.
+          Real women with real style, and the very first faces of Silver Young Models.
         </p>
 
         <ul className="mt-10 grid grid-cols-1 gap-6 min-[420px]:grid-cols-2 lg:grid-cols-3">
@@ -31,6 +31,16 @@ export function FoundingMembers() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-12 rounded-2xl bg-surface p-7 ring-1 ring-silver-200 sm:flex sm:items-center sm:justify-between sm:gap-8">
+          <p className="text-xl">
+            <span className="font-semibold">Want to be one of them?</span> Founding Members get a
+            special badge and first pick of brand requests.
+          </p>
+          <ButtonLink href="/join" className="mt-5 w-full shrink-0 sm:mt-0 sm:w-auto">
+            Become a Founding Member
+          </ButtonLink>
+        </div>
       </div>
     </section>
   );

@@ -16,7 +16,7 @@ const HERO_ALT =
  */
 export function HomeHero() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#2a1726] text-white sm:flex sm:min-h-[80svh] sm:items-center">
+    <section className="relative isolate overflow-hidden bg-[#2a1726] text-white sm:flex sm:min-h-[min(80svh,52rem)] sm:items-center">
       {/* Phone: picture band */}
       <div className="relative aspect-[16/10] sm:hidden">
         <Image
@@ -58,29 +58,19 @@ export function HomeHero() {
 
       <div className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-24">
         <div className="max-w-2xl [text-shadow:0_1px_12px_rgb(0_0_0/0.35)]">
-          <p className="text-lg font-semibold uppercase tracking-wider text-white/90">
-            For everyday people aged 50 and over
-          </p>
-          <h1 className="mt-4 text-5xl font-semibold sm:text-7xl">{site.tagline}</h1>
+          <h1 className="text-5xl font-semibold sm:text-7xl">{site.tagline}</h1>
           <p className="mt-6 text-xl text-white/95 sm:text-2xl">
-            Share your everyday style, get chosen by clothing brands for real photo shoots,
-            keep the clothes, and get paid.
+            Share your style, get discovered by fashion brands, and get paid to model their
+            clothes.
           </p>
         </div>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
           <ButtonLink href="/join" variant="light">
             Join as a Founding Member
           </ButtonLink>
-          <ButtonLink
-            href="/#how-it-works"
-            variant="secondary"
-            className="border-white! text-white! hover:bg-white/15!"
-          >
-            See how it works
-          </ButtonLink>
         </div>
-        <p className="mt-6 text-lg text-white/90">
-          Free to join. We never share your email or address.
+        <p className="mt-6 text-lg italic text-white/90">
+          Free to join. No experience needed. Just you and your phone.
         </p>
       </div>
     </section>
