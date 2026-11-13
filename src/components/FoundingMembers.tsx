@@ -1,15 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ButtonLink } from "./ButtonLink";
+import { getFoundingMembers, photoAlt, tilePhoto, type PublicMember } from "@/lib/public-members";
 
 /**
- * "Founding Members" grid.
- * Step 1: shows gray placeholder tiles only.
- * Step 4: real approved members (photo, first name, age, city) fill the
- * first tiles; placeholders fill the rest until there are enough members.
+ * "Founding Members" grid: real approved members (photo, first name, age,
+ * city) first; gray "Your photo here" spots fill the grid up to six tiles.
  */
-const PLACEHOLDER_COUNT = 6;
+const MIN_TILES = 6;
 
-export function FoundingMembers() {
+export async function FoundingMembers() {
+  const members = await getFoundingMembers();
+  const openSpots = Math.max(0, MIN_TILES - members.length);
+
   return (
     <section
       id="founding-members"
@@ -25,8 +28,13 @@ export function FoundingMembers() {
         </p>
 
         <ul className="mt-10 grid grid-cols-1 gap-6 min-[420px]:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: PLACEHOLDER_COUNT }, (_, i) => (
-            <li key={i}>
+          {members.map((m) => (
+            <li key={m.id}>
+              <MemberTile member={m} />
+            </li>
+          ))}
+          {Array.from({ length: openSpots }, (_, i) => (
+            <li key={`open-${i}`}>
               <PlaceholderTile />
             </li>
           ))}
@@ -43,6 +51,34 @@ export function FoundingMembers() {
         </div>
       </div>
     </section>
+  );
+}
+
+function MemberTile({ member }: { member: PublicMember }) {
+  const photo = tilePhoto(member);
+  return (
+    <Link href={`/members/${member.id}`} className="group block rounded-2xl no-underline">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-silver-100 ring-1 ring-silver-200">
+        {photo && (
+          <Image
+            src={photo.url}
+            alt={photoAlt(member, photo.kind)}
+            fill
+            sizes="(min-width: 1024px) 352px, (min-width: 420px) 50vw, 100vw"
+            className="object-cover object-top transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          />
+        )}
+      </div>
+      <p className="mt-3 text-xl font-semibold text-ink">
+        {member.firstName}, {member.age}
+      </p>
+      <p className="text-lg text-muted">
+        {member.city}, {member.state}
+      </p>
+      <p className="text-lg text-plum underline underline-offset-4">
+        See {member.firstName}&rsquo;s photos
+      </p>
+    </Link>
   );
 }
 
