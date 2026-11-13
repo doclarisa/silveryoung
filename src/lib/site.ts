@@ -4,7 +4,7 @@ export const site = {
   tagline: "Silver hair. Young spirit.",
   description:
     "Share your style, get discovered by fashion brands, and get paid to model their clothes. Free to join for women 50 and over. No experience needed.",
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://silveryoungmodels.com").replace(/\/$/, ""),
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.silveryoungmodels.com").replace(/\/$/, ""),
   // TODO: replace with your real contact address before launch.
   contactEmail: "hello@silveryoungmodels.com",
   // Homepage header video. Put the files in /public/hero/ and fill these in.
