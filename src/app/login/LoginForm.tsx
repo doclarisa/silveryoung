@@ -4,9 +4,21 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/safe-next";
+import { supabaseConfigured } from "@/lib/supabase/env";
 import { buttonClasses } from "@/components/ButtonLink";
 
 type Step = "email" | "code";
+
+const NOT_CONFIGURED =
+  "Sign-in isn't switched on for this website yet. Please try again later, or contact us.";
+
+/** Never leave the button stuck: give up after 20 seconds with a clear message. */
+function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
 
 const inputClasses =
   "mt-2 block w-full min-h-14 rounded-xl border-2 border-silver-300 bg-surface px-4 text-xl text-ink focus:border-plum focus:outline-none focus-visible:outline-3 focus-visible:outline-plum";
@@ -18,6 +30,9 @@ function friendlyError(message: string): string {
   }
   if (m.includes("expired") || m.includes("invalid") || m.includes("token")) {
     return "That code didn't work. It may be mistyped or expired. Check it, or send a new code.";
+  }
+  if (m.includes("timeout") || m.includes("fetch") || m.includes("network")) {
+    return "We couldn't reach the sign-in service. Please check your internet connection and try again.";
   }
   if (m.includes("email")) {
     return "Please check that your email address is typed correctly.";
@@ -42,21 +57,34 @@ export function LoginForm() {
   const [notice, setNotice] = useState<string | null>(null);
 
   async function sendEmail() {
+    if (!supabaseConfigured) {
+      setError(NOT_CONFIGURED);
+      return false;
+    }
     setBusy(true);
     setError(null);
     setNotice(null);
-    const supabase = createClient();
-    const confirmUrl = new URL("/auth/confirm", window.location.origin);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: confirmUrl.toString(), shouldCreateUser: true },
-    });
-    setBusy(false);
-    if (error) {
-      setError(friendlyError(error.message));
+    try {
+      const supabase = createClient();
+      const confirmUrl = new URL("/auth/confirm", window.location.origin);
+      const { error } = await withTimeout(
+        supabase.auth.signInWithOtp({
+          email: email.trim(),
+          options: { emailRedirectTo: confirmUrl.toString(), shouldCreateUser: true },
+        }),
+      );
+      if (error) {
+        setError(friendlyError(error.message));
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error("Sign-in email failed", e);
+      setError(friendlyError(e instanceof Error ? e.message : ""));
       return false;
+    } finally {
+      setBusy(false);
     }
-    return true;
   }
 
   async function onSubmitEmail(e: React.FormEvent) {
@@ -71,19 +99,27 @@ export function LoginForm() {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: code.replace(/\D/g, ""),
-      type: "email",
-    });
-    if (error) {
+    try {
+      const supabase = createClient();
+      const { error } = await withTimeout(
+        supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: code.replace(/\D/g, ""),
+          type: "email",
+        }),
+      );
+      if (error) {
+        setBusy(false);
+        setError(friendlyError(error.message));
+        return;
+      }
+      router.replace(next);
+      router.refresh();
+    } catch (e) {
+      console.error("Code check failed", e);
       setBusy(false);
-      setError(friendlyError(error.message));
-      return;
+      setError(friendlyError(e instanceof Error ? e.message : ""));
     }
-    router.replace(next);
-    router.refresh();
   }
 
   async function resend() {
