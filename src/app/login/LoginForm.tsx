@@ -6,19 +6,12 @@ import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/safe-next";
 import { supabaseConfigured } from "@/lib/supabase/env";
 import { buttonClasses } from "@/components/ButtonLink";
+import { withTimeout } from "@/lib/with-timeout";
 
 type Step = "email" | "code";
 
 const NOT_CONFIGURED =
   "Sign-in isn't switched on for this website yet. Please try again later, or contact us.";
-
-/** Never leave the button stuck: give up after 20 seconds with a clear message. */
-function withTimeout<T>(promise: Promise<T>, ms = 20000): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
-  ]);
-}
 
 const inputClasses =
   "mt-2 block w-full min-h-14 rounded-xl border-2 border-silver-300 bg-surface px-4 text-xl text-ink focus:border-plum focus:outline-none focus-visible:outline-3 focus-visible:outline-plum";

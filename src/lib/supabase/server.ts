@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { supabaseConfigured, supabasePublishableKey, supabaseUrl } from "./env";
 
@@ -34,6 +35,8 @@ export type CurrentUser = { id: string; email: string };
 /** The signed-in person, or null. Verifies the login token; never trust client input for this. */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   if (!supabaseConfigured) return null;
+  // Checking the login reads the clock (token expiry), so it must only run for a real visitor's request.
+  await connection();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims?.sub) return null;
