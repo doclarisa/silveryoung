@@ -34,6 +34,9 @@ function friendlyError(message: string): string {
   if (m.includes("timeout") || m.includes("fetch") || m.includes("network")) {
     return "We couldn't reach the sign-in service. Please check your internet connection and try again.";
   }
+  if (m.includes("sending") || m.includes("smtp")) {
+    return "We couldn't send the email just now. Please try again in a few minutes. If it keeps happening, contact us.";
+  }
   if (m.includes("email")) {
     return "Please check that your email address is typed correctly.";
   }
