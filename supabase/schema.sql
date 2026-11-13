@@ -8,6 +8,27 @@
 
 
 -- ---------------------------------------------------------------------
+-- 0. CLEAN START (FIRST-TIME SETUP ONLY)
+-- Removes anything a previous, partial run created, so this file can be
+-- run again safely while the site has NO members yet.
+-- !! NEVER run this file after real members have joined: it would
+-- !! delete all profiles, details, photo records and consents.
+-- ---------------------------------------------------------------------
+drop policy if exists "member-photos: read" on storage.objects;
+drop policy if exists "member-photos: upload to own folder" on storage.objects;
+drop policy if exists "member-photos: replace own files" on storage.objects;
+drop policy if exists "member-photos: delete own files (admin: any)" on storage.objects;
+
+drop table if exists public.photos, public.member_details, public.consents,
+  public.profiles, public.admin_emails cascade;
+
+drop function if exists public.profiles_guard() cascade;
+drop function if exists public.set_updated_at() cascade;
+drop function if exists public.consents_stamp() cascade;
+drop function if exists public.is_admin() cascade;
+
+
+-- ---------------------------------------------------------------------
 -- 1. ADMIN LIST
 -- Only emails in this table can approve or hide members.
 -- No one can read or change it from the website; only from this SQL editor.
