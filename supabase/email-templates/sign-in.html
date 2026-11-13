@@ -1,0 +1,22 @@
+<!--
+  Paste this into BOTH Supabase email templates:
+    Authentication → Emails → "Magic link"   and   "Confirm signup"
+  Subject line for both:  Your Silver Young Models sign-in code
+-->
+<div style="font-family: Arial, Helvetica, sans-serif; color: #1f1b1d; font-size: 18px; line-height: 1.6; max-width: 560px;">
+  <h1 style="font-family: Georgia, serif; font-size: 28px; margin: 0 0 16px;">Silver Young Models</h1>
+
+  <p>Hello! Tap the button below to sign in:</p>
+
+  <p style="margin: 24px 0;">
+    <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email"
+       style="display: inline-block; background: #6b2d5c; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 20px; padding: 16px 32px; border-radius: 999px;">
+      Sign in to Silver Young Models
+    </a>
+  </p>
+
+  <p>Or type this code on the sign-in page:</p>
+  <p style="font-size: 34px; font-weight: bold; letter-spacing: 6px; margin: 8px 0 24px;">{{ .Token }}</p>
+
+  <p style="color: #4a4548;">The button and code work for 1 hour. If you didn't ask to sign in, you can safely ignore this email.</p>
+</div>

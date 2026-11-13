@@ -1,12 +1,17 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ButtonLink } from "./ButtonLink";
 import { site } from "@/lib/site";
+import { getCurrentUser } from "@/lib/supabase/server";
 
 const navLinks = [
   { href: "/#how-it-works", label: "How it works" },
   { href: "/#founding-members", label: "Members" },
   { href: "/about", label: "About" },
 ];
+
+const textLink =
+  "inline-flex min-h-12 items-center rounded-full px-4 text-lg text-ink underline-offset-4 hover:underline";
 
 export function SiteHeader() {
   return (
@@ -19,24 +24,45 @@ export function SiteHeader() {
           {site.name}
         </Link>
 
-        <nav aria-label="Main" className="flex flex-wrap items-center gap-x-2 gap-y-2">
-          <ul className="hidden items-center gap-x-1 md:flex">
+        <nav aria-label="Main" className="flex flex-wrap items-center gap-x-1 gap-y-2">
+          <ul className="hidden items-center gap-x-1 lg:flex">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <Link
-                  href={l.href}
-                  className="inline-flex min-h-12 items-center rounded-full px-4 text-lg text-ink underline-offset-4 hover:underline"
-                >
+                <Link href={l.href} className={textLink}>
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
-          <ButtonLink href="/join" className="min-h-12! px-6! text-base!">
-            Join free
-          </ButtonLink>
+          {/* Who is signed in is only known per visitor, so this part loads separately. */}
+          <Suspense fallback={<SignedOutLinks />}>
+            <AccountLinks />
+          </Suspense>
         </nav>
       </div>
     </header>
+  );
+}
+
+async function AccountLinks() {
+  const user = await getCurrentUser();
+  if (!user) return <SignedOutLinks />;
+  return (
+    <ButtonLink href="/account" className="min-h-12! px-6! text-base!">
+      My account
+    </ButtonLink>
+  );
+}
+
+function SignedOutLinks() {
+  return (
+    <>
+      <Link href="/login" className={`${textLink} underline lg:no-underline`}>
+        Sign in
+      </Link>
+      <ButtonLink href="/join" className="min-h-12! px-6! text-base!">
+        Join free
+      </ButtonLink>
+    </>
   );
 }
