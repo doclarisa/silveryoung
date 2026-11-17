@@ -8,7 +8,19 @@ import { useEffect, useRef, useState } from "react";
  * - Does NOT autoplay for people who turned on "reduce motion".
  * - Always has a visible Pause/Play button (accessibility rule for moving content).
  */
-export function HeroVideo({ src, poster, label }: { src: string; poster: string; label?: string }) {
+export function HeroVideo({
+  src,
+  poster,
+  label,
+  pauseLabel,
+  playLabel,
+}: {
+  src: string;
+  poster: string;
+  label?: string;
+  pauseLabel: string;
+  playLabel: string;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -55,7 +67,7 @@ export function HeroVideo({ src, poster, label }: { src: string; poster: string;
           onClick={toggle}
           className="min-h-12 rounded-full border-2 border-white/80 bg-black/55 px-5 text-lg font-semibold text-white hover:bg-black/75"
         >
-          {playing ? "Pause video" : "Play video"}
+          {playing ? pauseLabel : playLabel}
         </button>
       </div>
     </>

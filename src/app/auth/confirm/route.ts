@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/safe-next";
+import { lp, splitLocale } from "@/i18n/config";
 
 /**
  * The sign-in link in the email lands here.
@@ -31,5 +32,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  redirect("/login?error=link");
+  // Show the "link expired" message in the language the member was using.
+  redirect(lp(splitLocale(next).locale, "/login?error=link"));
 }

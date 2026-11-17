@@ -1,9 +1,11 @@
 "use server";
 
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
+import { dictionaryFor } from "@/i18n/dictionaries";
+import { defaultLocale, isLocale } from "@/i18n/config";
+import { fmt } from "@/i18n/format";
 import {
   ABOUT_MAX,
-  CONSENT_TEXT,
   CONSENT_TYPE,
   LETTER_SIZES,
   MAX_HEIGHT_INCHES,
@@ -37,6 +39,8 @@ export type JoinInput = {
   aboutStyle: string;
   photos: JoinPhoto[];
   consent: boolean;
+  /** Language of the form, for messages and the saved consent wording. */
+  locale: string;
 };
 
 export type JoinResult = { ok: true } | { ok: false; error: string };
@@ -52,8 +56,10 @@ function clean(s: unknown, max: number): string {
  * and Row Level Security in the database checks once more.
  */
 export async function submitJoin(input: JoinInput): Promise<JoinResult> {
+  const t = dictionaryFor(isLocale(input?.locale) ? input.locale : defaultLocale);
+  const e = t.join.errors;
   const user = await getCurrentUser();
-  if (!user) return fail("Your sign-in has expired. Please sign in again, then fill in the form.");
+  if (!user) return fail(e.signedOut);
 
   // --- Check every field ---------------------------------------------------
   const firstName = clean(input?.firstName, 40);
@@ -66,36 +72,36 @@ export async function submitJoin(input: JoinInput): Promise<JoinResult> {
   const sizeType = String(input?.sizeType ?? "");
   const letterSize = input?.letterSize ? String(input.letterSize) : null;
 
-  if (!firstName) return fail("Please enter your first name.");
+  if (!firstName) return fail(e.firstName);
   if (!Number.isInteger(birthYear) || birthYear < OLDEST_BIRTH_YEAR || birthYear > 2100) {
-    return fail("Please enter your birth year as four numbers, for example 1962.");
+    return fail(e.birthYear);
   }
-  if (birthYear > latestBirthYear()) return fail("Members must be 50 or older.");
-  if (!city) return fail("Please enter your city.");
-  if (!state) return fail("Please enter your state.");
+  if (birthYear > latestBirthYear()) return fail(e.tooYoung);
+  if (!city) return fail(e.city);
+  if (!state) return fail(e.state);
   if (!Number.isInteger(heightInches) || heightInches < MIN_HEIGHT_INCHES || heightInches > MAX_HEIGHT_INCHES) {
-    return fail("Please choose your height.");
+    return fail(e.height);
   }
-  if (!SIZE_TYPES.some((s) => s.value === sizeType)) return fail("Please choose your size type.");
-  if (!SIZE_NUMBERS.includes(sizeNumber)) return fail("Please choose your size.");
+  if (!SIZE_TYPES.some((s) => s.value === sizeType)) return fail(e.sizeType);
+  if (!SIZE_NUMBERS.includes(sizeNumber)) return fail(e.size);
   if (letterSize !== null && !(LETTER_SIZES as readonly string[]).includes(letterSize)) {
-    return fail("Please choose a letter size from the list, or leave it empty.");
+    return fail(e.letterSize);
   }
-  if (input?.consent !== true) return fail("Please tick the box to agree before joining.");
+  if (input?.consent !== true) return fail(e.consent);
 
   const photos = Array.isArray(input?.photos) ? input.photos : [];
   for (const kind of PHOTO_KINDS) {
     const matching = photos.filter((p) => p?.kind === kind.value);
-    if (matching.length !== 1) return fail(`Please add your photo: ${kind.label.toLowerCase()}.`);
+    if (matching.length !== 1) return fail(fmt(e.photoMissing, { kind: t.options.photoKinds[kind.value].label.toLocaleLowerCase() }));
   }
-  if (photos.length !== PHOTO_KINDS.length) return fail("Please add exactly three photos.");
+  if (photos.length !== PHOTO_KINDS.length) return fail(e.photoCount);
   const prefix = `${user.id}/`;
   for (const p of photos) {
     if (typeof p.path !== "string" || !p.path.startsWith(prefix) || p.path.includes("..")) {
-      return fail("Something went wrong with your photos. Please add them again.");
+      return fail(e.photoBroken);
     }
     if (!VISIBILITY.some((v) => v.value === p.visibility)) {
-      return fail("Please choose Public or Brands only for each photo.");
+      return fail(e.visibility);
     }
   }
 
@@ -103,16 +109,16 @@ export async function submitJoin(input: JoinInput): Promise<JoinResult> {
 
   // --- Already joined? -----------------------------------------------------
   const { data: existing } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle();
-  if (existing) return fail("You have already joined. Go to My account to see your profile.");
+  if (existing) return fail(e.already);
 
   // --- The photo files must really be in this member's folder ---------------
   const { data: files, error: listError } = await supabase.storage
     .from(PHOTO_BUCKET)
     .list(user.id, { limit: 100 });
-  if (listError) return fail("We couldn't check your photos. Please try again.");
+  if (listError) return fail(e.photoCheck);
   const uploaded = new Set((files ?? []).map((f) => `${user.id}/${f.name}`));
   if (!photos.every((p) => uploaded.has(p.path))) {
-    return fail("One of your photos didn't finish uploading. Please try again.");
+    return fail(e.photoUnfinished);
   }
 
   // --- Save ----------------------------------------------------------------
@@ -121,8 +127,8 @@ export async function submitJoin(input: JoinInput): Promise<JoinResult> {
     .insert({ id: user.id, first_name: firstName, birth_year: birthYear, city, state });
   if (profileError) {
     console.error("join: profile insert failed", profileError);
-    if (profileError.message.includes("50 or older")) return fail("Members must be 50 or older.");
-    return fail("We couldn't save your profile. Please try again in a moment.");
+    if (profileError.message.includes("50 or older")) return fail(e.tooYoung);
+    return fail(e.save);
   }
 
   // If anything after this fails, remove the profile again (its details and
@@ -130,7 +136,7 @@ export async function submitJoin(input: JoinInput): Promise<JoinResult> {
   const undo = async (logLabel: string, err: unknown): Promise<JoinResult> => {
     console.error(`join: ${logLabel} failed`, err);
     await supabase.from("profiles").delete().eq("id", user.id);
-    return fail("We couldn't save your profile. Please try again in a moment.");
+    return fail(e.save);
   };
 
   const { error: detailsError } = await supabase.from("member_details").insert({
@@ -159,10 +165,10 @@ export async function submitJoin(input: JoinInput): Promise<JoinResult> {
   );
   if (photosError) return undo("photos insert", photosError);
 
-  // The time of agreement is set by the database, not by the browser.
+  // Saves the exact words she agreed to, in her language. The time is set by the database.
   const { error: consentError } = await supabase
     .from("consents")
-    .insert({ user_id: user.id, consent_type: CONSENT_TYPE, consent_text: CONSENT_TEXT });
+    .insert({ user_id: user.id, consent_type: CONSENT_TYPE, consent_text: t.join.consentText });
   if (consentError) return undo("consent insert", consentError);
 
   return { ok: true };

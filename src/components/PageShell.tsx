@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getI18n } from "@/i18n/server";
 
 /** Simple wrapper for text pages (About, Privacy, Terms, Contact…). */
 export function PageShell({
@@ -22,10 +23,11 @@ export function PageShell({
 }
 
 /** Clearly marked text the site owner still needs to write. */
-export function Placeholder({ children }: { children: ReactNode }) {
+export async function Placeholder({ children }: { children: ReactNode }) {
+  const { t } = await getI18n();
   return (
     <p className="rounded-lg border-2 border-dashed border-silver-300 bg-silver-50 p-4 text-muted">
-      <span className="font-semibold text-ink">Placeholder text: </span>
+      <span className="font-semibold text-ink">{t.placeholderLabel} </span>
       {children}
     </p>
   );

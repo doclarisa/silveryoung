@@ -1,32 +1,18 @@
-const shots = [
-  {
-    title: "1. Full length, from the front",
-    text: "Head to toe, standing naturally, arms relaxed.",
-  },
-  {
-    title: "2. Full length, from the side",
-    text: "Turn sideways so brands can see how clothes fall.",
-  },
-  {
-    title: "3. A smiling close-up",
-    text: "Head and shoulders. Just be yourself.",
-  },
-];
+import { PHOTO_KINDS } from "@/lib/member-options";
+import { getI18n } from "@/i18n/server";
 
-const tips = [
-  "Stand near a window in daylight. Avoid flash.",
-  "Use a plain wall or door behind you.",
-  "Ask a friend to take it, or prop your phone at waist height.",
-  "Wear something you love that fits well.",
-  "No filters, please. Brands want the real you.",
-];
-
-export function PhotoTips() {
+export async function PhotoTips() {
+  const { t } = await getI18n();
+  const shots = PHOTO_KINDS.map((k, i) => ({
+    title: `${i + 1}. ${t.options.photoKinds[k.value].label}`,
+    text: t.options.photoKinds[k.value].hint,
+  }));
+  const tips = t.photoTips.tips;
   return (
     <div className="grid gap-8 md:grid-cols-2">
       <section aria-labelledby="shots-heading">
         <h3 id="shots-heading" className="text-2xl font-semibold">
-          The three photos
+          {t.photoTips.shotsHeading}
         </h3>
         <ol className="mt-4 space-y-4">
           {shots.map((s) => (
@@ -39,7 +25,7 @@ export function PhotoTips() {
       </section>
       <section aria-labelledby="tips-heading">
         <h3 id="tips-heading" className="text-2xl font-semibold">
-          Tips for great photos
+          {t.photoTips.tipsHeading}
         </h3>
         <ul className="mt-4 space-y-3 text-lg">
           {tips.map((t) => (

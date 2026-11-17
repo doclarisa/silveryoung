@@ -2,7 +2,9 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseConfigured, supabasePublishableKey, supabaseUrl } from "@/lib/supabase/env";
-import { PHOTO_BUCKET, PHOTO_KINDS, ageFromBirthYear } from "@/lib/member-options";
+import { PHOTO_BUCKET, ageFromBirthYear } from "@/lib/member-options";
+import type { Dictionary } from "@/i18n/dictionaries";
+import { fmt } from "@/i18n/format";
 
 /*
  * What any visitor may see: approved members' first name, age, city/state and
@@ -136,7 +138,8 @@ export function tilePhoto(m: PublicMember): PublicPhoto | null {
   return m.photos.find((p) => p.kind === "closeup") ?? m.photos[0] ?? null;
 }
 
-export function photoAlt(m: PublicMember, kind: string): string {
-  const label = PHOTO_KINDS.find((k) => k.value === kind)?.label.toLowerCase() ?? "photo";
-  return `${m.firstName}, ${m.age}, from ${m.city}: ${label}`;
+export function photoAlt(m: PublicMember, kind: string, t: Dictionary): string {
+  const kinds = t.options.photoKinds as Record<string, { label: string }>;
+  const label = kinds[kind]?.label.toLocaleLowerCase() ?? kind;
+  return fmt(t.member.photoAlt, { name: m.firstName, age: m.age, city: m.city, kind: label });
 }

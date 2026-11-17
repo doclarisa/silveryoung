@@ -34,6 +34,14 @@
   color-scheme: light;
 }
 
+/* Russian and Greek pages: Fraunces and Atkinson have no Cyrillic/Greek letters,
+   so use Literata (headings) and Noto Sans (text), which have all three alphabets. */
+html:lang(ru),
+html:lang(el) {
+  --font-serif: var(--font-literata), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-noto), "Segoe UI", Arial, sans-serif;
+}
+
 /* Base size 18px on phones, 19px on larger screens. Everything in rem scales with it. */
 html {
   font-size: 112.5%;

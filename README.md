@@ -23,3 +23,13 @@ Open http://localhost:3000.
 | About / Privacy / Terms / Contact | `src/app/about`, `privacy`, `terms`, `contact` |
 | Colors and fonts | `src/app/globals.css`, `src/app/layout.tsx` |
 | Things to do before launch | `TODO.md` |
+
+## Languages
+
+The site is in English, Russian and Greek. English keeps plain addresses (`/join`);
+Russian and Greek use `/ru/join` and `/el/join`. The visitor's choice is remembered.
+
+- All words on the site: `src/i18n/dictionaries/en.ts`, `ru.ts`, `el.ts`
+  (same keys in each; TypeScript complains if one is missing).
+- Language settings and link helper: `src/i18n/config.ts`
+- Pages live in `src/app/[lang]/`; `src/proxy.ts` sends plain addresses to English.

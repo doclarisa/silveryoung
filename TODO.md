@@ -19,3 +19,9 @@
       (later stage). Until then, brand contact must go through you.
 - [ ] **"Photos cleared for your marketing"**: Terms must include a photo licence that
       members agree to for each brand shoot.
+
+## Languages (English, Russian, Greek)
+- [ ] Have a native Greek speaker review src/i18n/dictionaries/el.ts.
+- [ ] Check the Russian wording in src/i18n/dictionaries/ru.ts.
+- [ ] Once a lawyer has finalized the English Privacy Policy and Terms, get proper translations of both.
+- [ ] Re-paste supabase/email-templates/sign-in.html into Supabase (now in all three languages).

@@ -11,7 +11,13 @@ export type CompressedPhoto = { blob: Blob; width: number; height: number; previ
 const MAX_SIDE = 2000;
 const MAX_INPUT_BYTES = 40 * 1024 * 1024;
 
-export class PhotoError extends Error {}
+/** code matches join.photoErrors in the dictionaries, so the form can show it in any language. */
+export type PhotoErrorCode = "notPhoto" | "tooLarge" | "cantOpen" | "tooSmall" | "browser" | "stillTooLarge";
+export class PhotoError extends Error {
+  constructor(public code: PhotoErrorCode) {
+    super(code);
+  }
+}
 
 async function decode(file: File): Promise<{ source: CanvasImageSource; width: number; height: number; close: () => void }> {
   try {
@@ -28,25 +34,23 @@ async function decode(file: File): Promise<{ source: CanvasImageSource; width: n
       return { source: img, width: img.naturalWidth, height: img.naturalHeight, close: () => URL.revokeObjectURL(url) };
     } catch {
       URL.revokeObjectURL(url);
-      throw new PhotoError(
-        "We couldn't open that photo. Please choose a JPEG or PNG photo, or take a new one.",
-      );
+      throw new PhotoError("cantOpen");
     }
   }
 }
 
 export async function compressImage(file: File, maxBytes: number): Promise<CompressedPhoto> {
   if (!file.type.startsWith("image/") && !/\.(heic|heif)$/i.test(file.name)) {
-    throw new PhotoError("That file isn't a photo. Please choose a photo.");
+    throw new PhotoError("notPhoto");
   }
   if (file.size > MAX_INPUT_BYTES) {
-    throw new PhotoError("That photo is too large to use. Please choose a smaller one.");
+    throw new PhotoError("tooLarge");
   }
 
   const img = await decode(file);
   try {
     if (img.width < 300 || img.height < 300) {
-      throw new PhotoError("That photo is very small. Please choose a larger, clearer photo.");
+      throw new PhotoError("tooSmall");
     }
     const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
     const width = Math.round(img.width * scale);
@@ -56,7 +60,7 @@ export async function compressImage(file: File, maxBytes: number): Promise<Compr
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new PhotoError("Your browser couldn't prepare the photo. Please try another browser.");
+    if (!ctx) throw new PhotoError("browser");
     ctx.fillStyle = "#ffffff"; // transparent PNGs get a white background
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(img.source, 0, 0, width, height);
@@ -67,7 +71,7 @@ export async function compressImage(file: File, maxBytes: number): Promise<Compr
         return { blob, width, height, previewUrl: URL.createObjectURL(blob) };
       }
     }
-    throw new PhotoError("That photo is too large, even after shrinking. Please choose another.");
+    throw new PhotoError("stillTooLarge");
   } finally {
     img.close();
   }
