@@ -19,6 +19,12 @@
   --color-plum: #6b2d5c;       /* the one accent */
   --color-plum-dark: #4f1f43;
   --color-plum-50: #f6edf3;
+  /* Dark header, hero and footer (from the SY logo). White on night ≈ 18:1. */
+  --color-night: #121013;
+  --color-night-soft: #1d1a1f;
+  --color-cream: #f4f1ec;      /* logo letters */
+  --color-glass: #4a4553;      /* logo glass */
+  --color-mist: #c9c4cf;       /* secondary text on night ≈ 11:1 */
 
   --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-atkinson), "Segoe UI", Arial, sans-serif;

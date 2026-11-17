@@ -10,13 +10,13 @@ const HERO_ALT =
 
 /**
  * Homepage header.
- * Phones: the picture sits as a band on top, text below on deep plum (people stay visible).
- * Larger screens: the picture fills the header, plum shading on the left behind the text.
+ * Phones: the picture sits as a band on top, text below on near-black (people stay visible).
+ * Larger screens: the picture fills the screen, dark shading on the left behind the text.
  * When site.heroVideo is set, the video replaces the picture on larger screens.
  */
 export function HomeHero() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#2a1726] text-white sm:flex sm:min-h-[min(80svh,52rem)] sm:items-center">
+    <section className="relative isolate overflow-hidden bg-night text-cream sm:flex sm:min-h-[min(88svh,56rem)] sm:items-end">
       {/* Phone: picture band */}
       <div className="relative aspect-[16/10] sm:hidden">
         <Image
@@ -49,27 +49,31 @@ export function HomeHero() {
             className="object-cover object-[70%_60%]"
           />
         )}
-        {/* Plum shading keeps the white text readable over the bright sky */}
+        {/* Dark shading keeps the text readable over the bright sky */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-[#2a1726]/90 from-0% via-[#2a1726]/65 via-45% to-transparent to-80%"
+          className="absolute inset-0 bg-gradient-to-r from-night/90 from-0% via-night/60 via-45% to-transparent to-80%"
         />
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-24">
+      <div className="mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:pb-20 sm:pt-32">
         <div className="max-w-2xl [text-shadow:0_1px_12px_rgb(0_0_0/0.35)]">
-          <h1 className="text-5xl font-semibold sm:text-7xl">{site.tagline}</h1>
-          <p className="mt-6 text-xl text-white/95 sm:text-2xl">
+          <p className="text-base uppercase tracking-[0.3em] text-cream/90">Models 50+ &middot; Free to join</p>
+          <h1 className="mt-4 text-5xl font-semibold sm:text-7xl">{site.tagline}</h1>
+          <p className="mt-6 text-xl text-cream/95 sm:text-2xl">
             Share your style, get discovered by fashion brands, and get paid to model their
             clothes.
           </p>
         </div>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <ButtonLink href="/join" variant="light">
+          <ButtonLink href="/join" variant="light" className="uppercase tracking-[0.12em]">
             Join as a Founding Member
           </ButtonLink>
+          <ButtonLink href="/#for-brands" variant="outlineLight" className="uppercase tracking-[0.12em]">
+            For brands
+          </ButtonLink>
         </div>
-        <p className="mt-6 text-lg italic text-white/90">
+        <p className="mt-6 text-lg italic text-cream/90">
           Free to join. No experience needed. Just you and your phone.
         </p>
       </div>
